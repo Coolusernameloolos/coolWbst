@@ -1,42 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TTS Generator</title>
-  <script>
-    async function generateTTS(text) {
-      const apiUrl = `https://api.voicerss.org/?key=YOUR_API_KEY&hl=en-us&src=${encodeURIComponent(text)}&r=0&c=MP3`;
-
-      // Fetch the audio file from the TTS API
-      const response = await fetch(apiUrl);
-      if (!response.ok) {
-        console.error("Error fetching TTS data");
-        return null;
-      }
-
-      // Return the audio URL
-      const audioUrl = response.url;
-      return audioUrl;
-    }
-
-    // This is an endpoint for Roblox to call
-    async function handleRequest(request) {
-      const text = request.text;
-      const audioUrl = await generateTTS(text);
-      return new Response(audioUrl, { status: 200 });
-    }
-
-    self.addEventListener("fetch", (event) => {
-      const url = new URL(event.request.url);
-      if (url.pathname === "/generate-tts") {
-        const text = url.searchParams.get("text");
-        event.respondWith(handleRequest({ text }));
-      }
-    });
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech Generator</title>
 </head>
 <body>
-  <h1>Text to Speech</h1>
+    <h1>Text-to-Speech Generator</h1>
+    <input type="text" id="inputText" placeholder="Enter text here">
+    <button onclick="generateTTS()">Generate TTS</button>
+    <script>
+        function generateTTS() {
+            // Get the input text
+            var inputText = document.getElementById("inputText").value.trim();
+
+            // Check if the input starts with '/generate-tts'
+            if (inputText.startsWith("/generate-tts")) {
+                // Extract the word after '/generate-tts'
+                var wordToSpeak = inputText.replace("/generate-tts", "").trim();
+
+                // Ensure there's a word to speak
+                if (wordToSpeak) {
+                    var speech = new SpeechSynthesisUtterance(wordToSpeak);
+
+                    // Set the voice (optional, you can customize this)
+                    var voices = window.speechSynthesis.getVoices();
+                    speech.voice = voices[0]; // Default voice, you can customize this
+
+                    // Set volume, rate, pitch (optional)
+                    speech.volume = 1; // Range: 0 to 1
+                    speech.rate = 1; // Range: 0.1 to 10
+                    speech.pitch = 1; // Range: 0 to 2
+
+                    // Play the speech
+                    window.speechSynthesis.speak(speech);
+                } else {
+                    alert("Please enter a word to speak.");
+                }
+            } else {
+                alert("The command must start with '/generate-tts'.");
+            }
+        }
+    </script>
 </body>
 </html>
