@@ -7,40 +7,34 @@
 </head>
 <body>
     <h1>Text-to-Speech Generator</h1>
-    <input type="text" id="inputText" placeholder="Enter text here">
-    <button onclick="generateTTS()">Generate TTS</button>
+
     <script>
-        function generateTTS() {
-            // Get the input text
-            var inputText = document.getElementById("inputText").value.trim();
+        // Check if the URL path contains '/generate-tts-' and extract the word
+        window.onload = function() {
+            const path = window.location.pathname;
 
-            // Check if the input starts with '/generate-tts'
-            if (inputText.startsWith("/generate-tts")) {
-                // Extract the word after '/generate-tts'
-                var wordToSpeak = inputText.replace("/generate-tts", "").trim();
+            // Example: "/coolWbst/generate-tts-Hey"
+            const match = path.match(/\/generate-tts-(.*)$/);
 
-                // Ensure there's a word to speak
-                if (wordToSpeak) {
-                    var speech = new SpeechSynthesisUtterance(wordToSpeak);
+            if (match && match[1]) {
+                const textToSpeak = match[1]; // The word after '/generate-tts-'
 
-                    // Set the voice (optional, you can customize this)
-                    var voices = window.speechSynthesis.getVoices();
-                    speech.voice = voices[0]; // Default voice, you can customize this
+                // Use the SpeechSynthesis API to speak the word
+                const speech = new SpeechSynthesisUtterance(textToSpeak);
 
-                    // Set volume, rate, pitch (optional)
-                    speech.volume = 1; // Range: 0 to 1
-                    speech.rate = 1; // Range: 0.1 to 10
-                    speech.pitch = 1; // Range: 0 to 2
+                // Optionally, customize the voice and other settings
+                const voices = window.speechSynthesis.getVoices();
+                speech.voice = voices[0]; // You can pick any available voice
+                speech.volume = 1; // Max volume
+                speech.rate = 1; // Normal speed
+                speech.pitch = 1; // Normal pitch
 
-                    // Play the speech
-                    window.speechSynthesis.speak(speech);
-                } else {
-                    alert("Please enter a word to speak.");
-                }
+                // Speak the text
+                window.speechSynthesis.speak(speech);
             } else {
-                alert("The command must start with '/generate-tts'.");
+                console.log('No valid text found in the URL.');
             }
-        }
+        };
     </script>
 </body>
 </html>
