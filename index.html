@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTS Generator</title>
+  <script>
+    async function generateTTS(text) {
+      const apiUrl = `https://api.voicerss.org/?key=YOUR_API_KEY&hl=en-us&src=${encodeURIComponent(text)}&r=0&c=MP3`;
+
+      // Fetch the audio file from the TTS API
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        console.error("Error fetching TTS data");
+        return null;
+      }
+
+      // Return the audio URL
+      const audioUrl = response.url;
+      return audioUrl;
+    }
+
+    // This is an endpoint for Roblox to call
+    async function handleRequest(request) {
+      const text = request.text;
+      const audioUrl = await generateTTS(text);
+      return new Response(audioUrl, { status: 200 });
+    }
+
+    self.addEventListener("fetch", (event) => {
+      const url = new URL(event.request.url);
+      if (url.pathname === "/generate-tts") {
+        const text = url.searchParams.get("text");
+        event.respondWith(handleRequest({ text }));
+      }
+    });
+  </script>
+</head>
+<body>
+  <h1>Text to Speech</h1>
+</body>
+</html>
